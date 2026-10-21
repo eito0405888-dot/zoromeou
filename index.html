@@ -1,77 +1,90 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ゾロ目王</title>
+<title>ゾロ目王 ONLINE</title>
 <style>
-:root{--bg:#071b12;--panel:#10291d;--green:#35d07f;--light:#9af0bc;--text:#f1fff6;--muted:#b4d2bf;--line:#315542}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif}header{text-align:center;padding:22px 12px;background:#103522;border-bottom:1px solid var(--line)}h1{margin:0;color:var(--light);font-size:34px}header p{font-size:12px;color:var(--muted)}.notice{margin:12px auto;padding:10px;max-width:900px;border:1px solid #8e773c;background:#2e2916;color:#ffe7a1;border-radius:10px;font-size:12px}nav{display:flex;gap:7px;flex-wrap:wrap;padding:12px;max-width:900px;margin:auto}button{background:#173a27;color:var(--text);border:1px solid var(--line);padding:10px 13px;border-radius:9px;font-weight:bold;cursor:pointer}button.primary,.active{background:var(--green);color:#062012;border-color:var(--green)}button.danger{background:#492323}button:disabled{opacity:.55;cursor:wait}main{max-width:900px;margin:auto;padding:0 12px 35px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin-bottom:13px}h2{color:var(--light);font-size:21px;margin:0 0 12px}h3{font-size:16px;margin:16px 0 8px}label{display:block;color:var(--muted);font-size:13px;margin-bottom:5px}input,select{width:100%;padding:10px;background:#071b12;color:var(--text);border:1px solid #42664f;border-radius:8px;font:inherit}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.list{display:grid;gap:8px}.entry,.player-card{background:#163725;border:1px solid var(--line);padding:11px;border-radius:10px}.balance{color:var(--light);font-weight:bold}.small{font-size:12px;color:var(--muted)}.status{margin-top:10px;padding:10px;background:#071b12;border-radius:9px;overflow-wrap:anywhere}.hidden{display:none!important}.rolls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:8px;border-bottom:1px solid var(--line)}th{color:var(--light)}footer{text-align:center;font-size:11px;color:var(--muted);padding:15px}
-/* ルーレット */
-.roulette-stage{display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px 8px;margin:12px 0;border:1px solid var(--line);border-radius:14px;background:#071b12}.roulette-pointer{color:#ffe7a1;font-size:27px;line-height:1;margin-bottom:-17px;z-index:2}.roulette-wheel{width:min(72vw,270px);aspect-ratio:1;border-radius:50%;border:8px solid #d8b45a;background:repeating-conic-gradient(#b32632 0deg 9.73deg,#111c18 9.73deg 19.46deg,#b32632 19.46deg 29.19deg,#111c18 29.19deg 38.92deg);box-shadow:0 0 0 4px #624a20,0 0 25px #35d07f55,inset 0 0 0 5px #e8d59a;display:grid;place-items:center;position:relative;transform:rotate(0deg)}.roulette-wheel:before{content:"";position:absolute;inset:12%;border:2px solid #e8d59a;border-radius:50%}.roulette-center{z-index:1;width:35%;aspect-ratio:1;border-radius:50%;background:#103522;border:3px solid #e8d59a;display:grid;place-items:center;color:#9af0bc;font-size:30px;font-weight:900;box-shadow:0 0 15px #0009}.roulette-number{font-size:28px;font-weight:900;text-align:center}.roulette-win{color:#9af0bc;font-weight:900}.roulette-lose{color:#ff9b9b;font-weight:900}.bet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.bet-card{padding:10px;border:1px solid var(--line);border-radius:10px;background:#163725}.bet-card label{display:flex;align-items:center;gap:7px;color:var(--text);font-size:14px}.bet-card input[type=checkbox]{width:auto;accent-color:var(--green)}.bet-card input[type=number]{margin-top:6px}.bet-total{font-weight:800;color:var(--light);font-size:18px}.wheel-spinning{animation:wheelGlow .7s infinite alternate}@keyframes wheelGlow{from{box-shadow:0 0 0 4px #624a20,0 0 12px #35d07f55,inset 0 0 0 5px #e8d59a}to{box-shadow:0 0 0 4px #624a20,0 0 28px #35d07f99,inset 0 0 0 5px #e8d59a}}
-@media(max-width:520px){.grid,.bet-grid{grid-template-columns:1fr}.panel{padding:12px}nav button{flex:1}}
-@media(prefers-reduced-motion:reduce){.wheel-spinning{animation:none}}
+body{font-family:sans-serif;background:#eaf7ed;margin:0;padding:20px;color:#173b25}
+main{max-width:500px;margin:auto;background:white;padding:20px;border-radius:16px}
+h1{color:#16803d}input,button{box-sizing:border-box;width:100%;padding:12px;margin:6px 0;border-radius:8px}
+input{border:1px solid #aaa}button{border:0;background:#16803d;color:white;font-weight:bold}
+#status{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
-<header><h1>🎲 ゾロ目王</h1><p>シャー芯をかけて勝負！ 対戦もカジノも残高共有</p><div class="notice">単一端末用の簡易版です。データはこのブラウザ内に保存されます。管理者PINは本格的なセキュリティではありません。</div></header>
-<nav><button class="tab active" data-tab="players">登録</button><button class="tab" data-tab="match">対戦</button><button class="tab" data-tab="casino">カジノ</button><button class="tab" data-tab="admin">管理者</button><button class="tab" data-tab="history">履歴・ランキング</button></nav>
 <main>
-<section id="players" class="page"><div class="panel"><h2>プレイヤー登録</h2><p class="small">登録すると初期残高50本！ 同じ名前は登録できません。</p><form id="registerForm" class="row"><div><label>プレイヤー名</label><input id="newName" maxlength="20" required placeholder="名前を入力"></div><button class="primary" type="submit">登録する</button></form><div id="registerMsg" class="small"></div></div><div class="panel"><h2>登録済みプレイヤー</h2><div id="playerList" class="list"></div></div></section>
-<section id="match" class="page hidden"><div class="panel"><h2>🎲 ゾロ目王 対戦</h2><p class="small">2〜10人。各3回の出目。123が最強。同順位は同じ順位。</p><div class="row"><button id="addMatchPlayer">＋ 対戦者を追加</button><button id="removeMatchPlayer">− 最後の対戦者を削除</button></div><div id="matchPlayers" class="list" style="margin-top:12px"></div><div class="row" style="margin-top:10px"><button id="randomRolls">🎲 全員ランダム</button><button id="clearRolls">出目をリセット</button></div><button id="runMatch" class="primary" style="width:100%;margin-top:12px">結果判定・精算</button><div id="matchResult" class="status">対戦者を選んでね！</div></div></section>
-<section id="casino" class="page hidden">
-<div class="panel"><h2>🎡 ルーレット</h2><div class="grid"><div><label>プレイヤー</label><select id="roulettePlayer"></select></div></div>
-<div class="roulette-stage"><div class="roulette-pointer">▼</div><div id="rouletteWheel" class="roulette-wheel"><div id="rouletteCenter" class="roulette-center">?</div></div><div id="rouletteNumberDisplay" class="roulette-number">ルーレット待機中</div><div id="rouletteColor" class="small">赤・黒・緑の結果がここに表示される</div></div>
-<h3>今回の賭け（複数選択OK）</h3><p class="small">チェックを入れた賭けを、同じ出目でまとめて判定します。配当は掛け金込みです。</p>
-<div class="bet-grid">
-<div class="bet-card"><label><input id="betRedOn" type="checkbox"> 🔴 赤（2倍）</label><label>掛け金（本）</label><input id="betRed" type="number" min="1" step="1" value="1"></div>
-<div class="bet-card"><label><input id="betBlackOn" type="checkbox"> ⚫ 黒（2倍）</label><label>掛け金（本）</label><input id="betBlack" type="number" min="1" step="1" value="1"></div>
-<div class="bet-card"><label><input id="betOddOn" type="checkbox"> 奇数（2倍）</label><label>掛け金（本）</label><input id="betOdd" type="number" min="1" step="1" value="1"></div>
-<div class="bet-card"><label><input id="betEvenOn" type="checkbox"> 偶数（2倍）</label><label>掛け金（本）</label><input id="betEven" type="number" min="1" step="1" value="1"></div>
-<div class="bet-card"><label><input id="betNum1On" type="checkbox"> 数字指定①（36倍）</label><div class="row"><div><label>数字 0〜36</label><input id="betNum1" type="number" min="0" max="36" step="1" value="7"></div><div><label>掛け金</label><input id="betNum1Stake" type="number" min="1" step="1" value="1"></div></div></div>
-<div class="bet-card"><label><input id="betNum2On" type="checkbox"> 数字指定②（36倍）</label><div class="row"><div><label>数字 0〜36</label><input id="betNum2" type="number" min="0" max="36" step="1" value="17"></div><div><label>掛け金</label><input id="betNum2Stake" type="number" min="1" step="1" value="1"></div></div></div>
-<div class="bet-card"><label><input id="betNum3On" type="checkbox"> 数字指定③（36倍）</label><div class="row"><div><label>数字 0〜36</label><input id="betNum3" type="number" min="0" max="36" step="1" value="23"></div><div><label>掛け金</label><input id="betNum3Stake" type="number" min="1" step="1" value="1"></div></div></div>
-</div>
-<p>合計賭け本数：<span id="rouletteTotal" class="bet-total">0本</span></p><button id="playRoulette" class="primary" style="width:100%;margin-top:8px">🎡 まとめて回す！</button><div id="rouletteResult" class="status">賭けを選んで、ルーレットを回そう！</div></div>
-<div class="panel"><h2>🎲 サイコロカジノ</h2><div class="grid"><div><label>プレイヤー</label><select id="dicePlayer"></select></div><div><label>掛け金（本）</label><input id="diceStake" type="number" min="1" value="1"></div><div><label>予想する目</label><select id="diceGuess"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div></div><button id="playDice" class="primary" style="width:100%;margin-top:12px">サイコロを振る</button><div id="diceResult" class="status">的中したら掛け金込み5倍！</div></div></section>
-<section id="admin" class="page hidden"><div class="panel"><h2>🔐 管理者エリア</h2><p class="small">初期PIN：2580。ログイン後、すぐに変更してね。</p><div id="adminLogin"><label>管理者PIN</label><div class="row"><input id="adminPin" type="password" inputmode="numeric"><button id="adminLoginBtn" class="primary">ログイン</button></div><div id="adminMsg" class="small"></div></div><div id="adminTools" class="hidden"><h3>残高の変更</h3><div class="grid"><div><label>プレイヤー</label><select id="adminPlayer"></select></div><div><label>変更量（本）</label><input id="adminAmount" type="number" value="10"></div></div><p class="small">プラスで追加、マイナスで減らす。</p><button id="adjustBalance" class="primary">残高を変更</button><h3>管理者PINの変更</h3><div class="row"><input id="newPin" type="password" inputmode="numeric" placeholder="新しいPIN（4文字以上）"><button id="changePin">PIN変更</button></div><h3>プレイヤー削除</h3><div class="row"><select id="deletePlayerSelect"></select><button id="deletePlayer" class="danger">削除</button></div><button id="adminLogout" style="margin-top:10px">ログアウト</button><div id="adminToolsMsg" class="small"></div></div></div><div class="panel"><h2>バックアップ</h2><div class="row"><button id="exportData">書き出す</button><input id="importFile" type="file" accept="application/json"></div><div id="backupMsg" class="small"></div></div></section>
-<section id="history" class="page hidden"><div class="panel"><h2>🏆 残高ランキング</h2><div id="ranking"></div></div><div class="panel"><h2>対戦履歴</h2><div id="matchHistory" class="list"></div><button id="clearMatchHistory" class="danger">対戦履歴を削除</button></div><div class="panel"><h2>カジノ履歴</h2><div id="casinoHistory" class="list"></div><button id="clearCasinoHistory" class="danger">カジノ履歴を削除</button></div></section>
-</main><footer>ゾロ目王・単一端末用簡易版</footer>
-<script>
-"use strict";
-const K={p:"zo_players",m:"zo_matches",c:"zo_casino",pin:"zo_admin_pin"};
-const $=id=>document.getElementById(id);
-const read=(k,d)=>{try{const x=localStorage.getItem(k);return x===null?d:JSON.parse(x)}catch{return d}};
-let players=read(K.p,[]),matches=read(K.m,[]),casino=read(K.c,[]);
-if(!Array.isArray(players))players=[];if(!Array.isArray(matches))matches=[];if(!Array.isArray(casino))casino=[];
-let adminUnlocked=false,entries=[];
-const save=()=>{localStorage.setItem(K.p,JSON.stringify(players));render()};
-const get=n=>players.find(p=>p.name===n);const bal=n=>get(n)?.balance??0;
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const now=()=>new Date().toLocaleString("ja-JP");const msg=(id,t,cls="")=>{$(id).textContent=t;$(id).className="status"+(cls?" "+cls:"")};
-const options=old=>players.map(p=>`<option value="${esc(p.name)}" ${p.name===old?"selected":""}>${esc(p.name)}（${p.balance}本）</option>`).join("");
-function selects(){["roulettePlayer","dicePlayer","adminPlayer","deletePlayerSelect"].forEach(id=>{let e=$(id),v=e.value;e.innerHTML=options(v);if(!e.value&&players[0])e.value=players[0].name})}
-function renderPlayers(){$("playerList").innerHTML=players.length?players.map(p=>`<div class="entry row"><b>${esc(p.name)}</b><span class="balance">${p.balance}本</span></div>`).join(""):'<p class="small">まだ登録されていません。</p>'}
-function renderRanking(){let a=[...players].sort((x,y)=>y.balance-x.balance);$("ranking").innerHTML=a.length?`<table><tr><th>順位</th><th>名前</th><th>残高</th></tr>${a.map((p,i)=>`<tr><td>${i+1}</td><td>${esc(p.name)}</td><td>${p.balance}本</td></tr>`).join("")}</table>`:'<p class="small">プレイヤーを登録してね。</p>'}
-function renderHistory(){$("matchHistory").innerHTML=matches.length?matches.map(x=>`<div class="entry">${esc(x.date)}<br>${esc(x.text)}</div>`).join(""):'<p class="small">履歴なし</p>';$ ("casinoHistory").innerHTML=casino.length?casino.map(x=>`<div class="entry">${esc(x.date)}<br>${esc(x.text)}</div>`).join(""):'<p class="small">履歴なし</p>'}
-function renderEntries(){$("matchPlayers").innerHTML=entries.map((e,i)=>`<div class="player-card"><b>対戦者${i+1}</b><div class="grid"><div><label>プレイヤー</label><select class="ename"><option value="">選択</option>${options(e.name)}</select></div><div><label>掛け金</label><input class="stake" type="number" min="1" value="${e.stake}"></div></div><label style="margin-top:8px">3回の出目</label><div class="rolls">${e.rolls.map((v,j)=>`<div><label>${j+1}回目</label><select class="roll">${[1,2,3,4,5,6].map(n=>`<option ${n===v?"selected":""}>${n}</option>`).join("")}</select></div>`).join("")}</div></div>`).join("");document.querySelectorAll(".player-card").forEach((card,i)=>{card.querySelector(".ename").onchange=e=>{entries[i].name=e.target.value;renderEntries()};card.querySelector(".stake").onchange=e=>entries[i].stake=Number(e.target.value);card.querySelectorAll(".roll").forEach((el,j)=>el.onchange=e=>entries[i].rolls[j]=Number(e.target.value))})}
-function render(){renderPlayers();selects();renderRanking();renderHistory();renderEntries();updateRouletteTotal()}
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".page").forEach(p=>p.classList.toggle("hidden",p.id!==b.dataset.tab));document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===b))});
-$("registerForm").onsubmit=e=>{e.preventDefault();let name=$("newName").value.trim();if(!name)return;if(players.some(p=>p.name.toLowerCase()===name.toLowerCase()))return msg("registerMsg","その名前は登録済みです。","error");players.push({name,balance:50});$("newName").value="";save();msg("registerMsg",name+"を登録！初期残高50本","success")};
-function addCasino(game,text){casino.unshift({date:now(),game,text});casino=casino.slice(0,100);localStorage.setItem(K.c,JSON.stringify(casino));renderHistory()}
-$("addMatchPlayer").onclick=()=>{if(entries.length>=10)return msg("matchResult","最大10人です。","error");entries.push({name:"",stake:1,rolls:[1,2,3]});renderEntries()};$("removeMatchPlayer").onclick=()=>{if(entries.length>2)entries.pop();renderEntries()};$("randomRolls").onclick=()=>{entries.forEach(e=>e.rolls=[1,2,3].map(()=>1+Math.floor(Math.random()*6)));renderEntries()};$("clearRolls").onclick=()=>{entries.forEach(e=>e.rolls=[1,2,3]);renderEntries();msg("matchResult","出目をリセットしました。")};
-function hand(e){let a=[...e.rolls].sort((x,y)=>x-y),s=a.join("");if(s==="123")return{score:7000000,label:"123（最強）"};if(a[0]===a[2])return{score:6000000+a[0]*100,label:a[0]+"のゾロ目"};if(a[0]===a[1]||a[1]===a[2]){let p=a[0]===a[1]?a[0]:a[1],k=a[0]===a[1]?a[2]:a[0];return{score:4000000+p*100+k,label:p+"のペア＋"+k}}return{score:a[2]*100+a[1]*10+a[0],label:"通常役 "+a.join("")}}
-$("runMatch").onclick=()=>{if(entries.length<2)return msg("matchResult","2人以上で対戦してね。","error");let names=entries.map(e=>e.name);if(names.some(n=>!n)||new Set(names).size!==names.length)return msg("matchResult","別々の登録プレイヤーを全員選んでね。","error");for(let e of entries){if(!Number.isInteger(e.stake)||e.stake<1)return msg("matchResult","掛け金は1本以上。","error");if(bal(e.name)<e.stake)return msg("matchResult",e.name+"の残高不足","error")}let r=entries.map((e,i)=>({...e,...hand(e),i})).sort((a,b)=>b.score-a.score),rank=0,prev=null;r.forEach((x,i)=>{if(x.score!==prev)rank=i+1;x.rank=rank;prev=x.score});let first=r.filter(x=>x.rank===1),second=r.filter(x=>x.rank===2),lower=r.filter(x=>x.rank>=3);let pool=second.reduce((s,x)=>s+Math.floor(x.stake/2),0)+lower.reduce((s,x)=>s+x.stake,0);r.forEach(x=>{if(x.rank===2)get(x.name).balance-=Math.floor(x.stake/2);else if(x.rank>=3)get(x.name).balance-=x.stake});let each=first.length?Math.floor(pool/first.length):0,rem=first.length?pool%first.length:0;first.forEach((x,i)=>get(x.name).balance+=each+(i<rem?1:0));let text=r.map(x=>x.rank+"位 "+x.name+"："+x.label+"（掛け金"+x.stake+"本）").join(" / ")+"。配当総額"+pool+"本";matches.unshift({date:now(),text});matches=matches.slice(0,50);localStorage.setItem(K.m,JSON.stringify(matches));save();msg("matchResult",text,"success")};
-const reds=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
-const betInputs=["betRed","betBlack","betOdd","betEven","betNum1","betNum1Stake","betNum2","betNum2Stake","betNum3","betNum3Stake"];
-const activeBetIds=["betRedOn","betBlackOn","betOddOn","betEvenOn","betNum1On","betNum2On","betNum3On"];
-function updateRouletteTotal(){let total=0;const pairs=[["betRedOn","betRed"],["betBlackOn","betBlack"],["betOddOn","betOdd"],["betEvenOn","betEven"],["betNum1On","betNum1Stake"],["betNum2On","betNum2Stake"],["betNum3On","betNum3Stake"]];pairs.forEach(([c,s])=>{if($(c).checked)total+=Math.max(0,Number($(s).value)||0)});$("rouletteTotal").textContent=total+"本";return total}
-[...betInputs,...activeBetIds].forEach(id=>$(id).addEventListener("input",updateRouletteTotal));
-function rouletteBets(){let bets=[];if($("betRedOn").checked)bets.push({label:"赤",stake:Number($("betRed").value),win:n=>n!==0&&reds.has(n),mult:2});if($("betBlackOn").checked)bets.push({label:"黒",stake:Number($("betBlack").value),win:n=>n!==0&&!reds.has(n),mult:2});if($("betOddOn").checked)bets.push({label:"奇数",stake:Number($("betOdd").value),win:n=>n!==0&&n%2===1,mult:2});if($("betEvenOn").checked)bets.push({label:"偶数",stake:Number($("betEven").value),win:n=>n!==0&&n%2===0,mult:2});for(let i=1;i<=3;i++){if($("betNum"+i+"On").checked){let n=Number($("betNum"+i).value),stake=Number($("betNum"+i+"Stake").value);bets.push({label:"数字"+n,stake,validNum:Number.isInteger(n)&&n>=0&&n<=36,win:x=>x===n,mult:36})}}return bets}
-$("playRoulette").onclick=()=>{const btn=$("playRoulette"),name=$("roulettePlayer").value;if(btn.disabled)return;const bets=rouletteBets();if(!get(name))return msg("rouletteResult","先にプレイヤーを登録してね。","error");if(!bets.length)return msg("rouletteResult","賭けを1つ以上選んでね。","error");if(bets.some(b=>!Number.isInteger(b.stake)||b.stake<1||(b.validNum===false)))return msg("rouletteResult","各掛け金は1本以上、数字は0〜36にしてね。","error");const total=bets.reduce((s,b)=>s+b.stake,0);if(total>bal(name))return msg("rouletteResult","残高不足！ 合計「"+total+"本」、残高「"+bal(name)+"本」です。","error");const n=Math.floor(Math.random()*37),color=n===0?"緑":reds.has(n)?"赤":"黒",wheel=$("rouletteWheel");btn.disabled=true;btn.textContent="🎡 回転中...";wheel.classList.add("wheel-spinning");const rotation=360*7+Math.floor(Math.random()*360);wheel.style.transition="transform 3.8s cubic-bezier(.12,.72,.12,1)";wheel.style.transform=`rotate(${rotation}deg)`;$("rouletteCenter").textContent="?";$("rouletteNumberDisplay").textContent="回転中...";$("rouletteColor").textContent="ボールが回っています…";msg("rouletteResult","運命のルーレットが回転中！");setTimeout(()=>{wheel.classList.remove("wheel-spinning");const results=bets.map(b=>({...b,hit:b.win(n),payout:b.win(n)?b.stake*b.mult:0}));const payout=results.reduce((s,b)=>s+b.payout,0);get(name).balance+=payout-total;$("rouletteCenter").textContent=String(n);$("rouletteNumberDisplay").textContent="出目："+n;$("rouletteColor").textContent="結果："+color+"・"+(n===0?"ゼロ":n%2===0?"偶数":"奇数");$("rouletteColor").className=results.some(b=>b.hit)?"roulette-win":"roulette-lose";const net=payout-total;const detail=results.map(b=>b.label+" "+b.stake+"本："+(b.hit?"当たり +"+b.payout+"本（配当込み）":"はずれ −"+b.stake+"本")).join(" / ");const text=name+"：出目"+n+"（"+color+"）。"+detail+"。合計賭け"+total+"本・払戻"+payout+"本・差引"+(net>=0?"+":"")+net+"本";save();addCasino("ルーレット",text);msg("rouletteResult",text,net>=0?"roulette-win":"roulette-lose");btn.disabled=false;btn.textContent="🎡 もう一度回す！"},3900)};
-$("playDice").onclick=()=>{let name=$("dicePlayer").value,stake=Number($("diceStake").value),guess=Number($("diceGuess").value);if(!get(name)||!Number.isInteger(stake)||stake<1||bal(name)<stake)return msg("diceResult","プレイヤー・掛け金・残高を確認してね。","error");let n=1+Math.floor(Math.random()*6),win=n===guess;get(name).balance-=stake;if(win)get(name).balance+=stake*5;let text=name+"：予想"+guess+"／出目"+n+"。"+(win?"的中！+"+stake*5+"本":"はずれ −"+stake+"本");save();addCasino("サイコロ",text);msg("diceResult",text,win?"success":"")};
-$("adminLoginBtn").onclick=()=>{if($("adminPin").value===(localStorage.getItem(K.pin)||"2580")){adminUnlocked=true;$("adminLogin").classList.add("hidden");$("adminTools").classList.remove("hidden");msg("adminMsg","ログイン成功","success")}else msg("adminMsg","PINが違います","error")};$("adminLogout").onclick=()=>{adminUnlocked=false;$("adminTools").classList.add("hidden");$("adminLogin").classList.remove("hidden");$("adminPin").value=""};$("adjustBalance").onclick=()=>{let p=get($("adminPlayer").value),n=Number($("adminAmount").value);if(!adminUnlocked||!p||!Number.isInteger(n)||p.balance+n<0)return msg("adminToolsMsg","変更量を確認してね。","error");p.balance+=n;save();msg("adminToolsMsg",p.name+"の残高を"+(n>=0?"+":"")+n+"本変更しました。","success")};$("changePin").onclick=()=>{let p=$("newPin").value;if(!adminUnlocked)return;if(p.length<4)return msg("adminToolsMsg","PINは4文字以上。","error");localStorage.setItem(K.pin,p);$("newPin").value="";msg("adminToolsMsg","PINを変更しました。","success")};$("deletePlayer").onclick=()=>{let name=$("deletePlayerSelect").value;if(!adminUnlocked||!name)return;if(!confirm(name+"を削除しますか？"))return;players=players.filter(p=>p.name!==name);entries=entries.filter(e=>e.name!==name);save();msg("adminToolsMsg",name+"を削除しました。","success")};
-$("exportData").onclick=()=>{let data={players,matches,casino,pin:localStorage.getItem(K.pin)||"2580"},blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="zoromeou-backup.json";a.click();URL.revokeObjectURL(url);msg("backupMsg","バックアップを書き出しました。","success")};$("importFile").onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let d=JSON.parse(await f.text());if(!Array.isArray(d.players)||!Array.isArray(d.matches)||!Array.isArray(d.casino))throw Error();if(!confirm("今のデータを置き換えますか？"))return;players=d.players;matches=d.matches;casino=d.casino;localStorage.setItem(K.p,JSON.stringify(players));localStorage.setItem(K.m,JSON.stringify(matches));localStorage.setItem(K.c,JSON.stringify(casino));if(typeof d.pin==="string")localStorage.setItem(K.pin,d.pin);render();msg("backupMsg","復元しました。","success")}catch{msg("backupMsg","このファイルは読み込めません。","error")}finally{e.target.value=""}};
-$("clearMatchHistory").onclick=()=>{if(confirm("対戦履歴を削除する？")){matches=[];localStorage.setItem(K.m,"[]");renderHistory()}};$("clearCasinoHistory").onclick=()=>{if(confirm("カジノ履歴を削除する？")){casino=[];localStorage.setItem(K.c,"[]");renderHistory()}};
-entries=[{name:"",stake:1,rolls:[1,2,3]},{name:"",stake:1,rolls:[1,2,3]}];render();
-</script></body></html>
+<h1>🎲 ゾロ目王 ONLINE</h1>
+<p>Firebase接続テスト</p>
+<input id="email" type="email" placeholder="メールアドレス">
+<input id="password" type="password" placeholder="パスワード">
+<button id="login">ログイン</button>
+<button id="register">新規登録</button>
+<button id="logout">ログアウト</button>
+<p id="status">未接続</p>
+<hr>
+<h2>共有データテスト</h2>
+<input id="playerName" placeholder="プレイヤー名">
+<button id="save">名前をオンライン保存</button>
+<button id="load">共有データを読み込む</button>
+<pre id="data"></pre>
+</main>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAUywdd9AX6sCB8FzMWY7-L2oUPQ6ysycU",
+  authDomain: "zoromeou-online.firebaseapp.com",
+  projectId: "zoromeou-online",
+  storageBucket: "zoromeou-online.firebasestorage.app",
+  messagingSenderId: "372516850322",
+  appId: "1:372516850322:web:d04194b5f421ab2755b44b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const status = document.getElementById("status");
+const showError = e => status.textContent = "エラー: " + e.message;
+
+document.getElementById("register").onclick = async () => {
+ try {
+  await createUserWithEmailAndPassword(auth,email.value.trim(),password.value);
+ } catch(e) { showError(e); }
+};
+document.getElementById("login").onclick = async () => {
+ try {
+  await signInWithEmailAndPassword(auth,email.value.trim(),password.value);
+ } catch(e) { showError(e); }
+};
+document.getElementById("logout").onclick = () => signOut(auth).catch(showError);
+
+onAuthStateChanged(auth, user => {
+ status.textContent = user ? "ログイン中: " + user.email : "未ログイン";
+});
+
+document.getElementById("save").onclick = async () => {
+ try {
+  if(!auth.currentUser) throw Error("先にログインしてね");
+  const name = document.getElementById("playerName").value.trim();
+  if(!name) throw Error("プレイヤー名を入力してね");
+  await setDoc(doc(db,"players",auth.currentUser.uid), {
+   name, updatedAt: new Date().toISOString()
+  });
+  status.textContent = "保存成功！";
+ } catch(e) { showError(e); }
+};
+document.getElementById("load").onclick = async () => {
+ try {
+  if(!auth.currentUser) throw Error("先にログインしてね");
+  const snap = await getDoc(doc(db,"players",auth.currentUser.uid));
+  document.getElementById("data").textContent =
+   snap.exists() ? JSON.stringify(snap.data(),null,2) : "まだデータがありません";
+ } catch(e) { showError(e); }
+};
+</script>
+</body>
+</html>
