@@ -1,0 +1,336 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ゾロ目王</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #071b12;
+  --panel: #10291d;
+  --green: #3ddc84;
+  --muted: #b7c8bd;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: linear-gradient(135deg,#06160f,#102b1c);
+  color: #f4fff7;
+  font-family: system-ui,-apple-system,sans-serif;
+  padding: 20px;
+}
+main { max-width: 900px; margin: auto; }
+h1 { margin: 0; color: var(--green); font-size: 2.2rem; }
+p { color: var(--muted); }
+section {
+  background: var(--panel);
+  border: 1px solid #28533b;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+button,select,input {
+  font: inherit;
+  border-radius: 9px;
+  padding: 9px;
+  border: 1px solid #47765a;
+  background: #071b12;
+  color: white;
+}
+button {
+  cursor:pointer;
+  background:#1c6b43;
+  border:0;
+  font-weight:700;
+}
+button.secondary { background:#34483b; }
+button.danger { background:#8a3434; }
+.players {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+.player {
+  background:#0a2116;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #28533b;
+}
+.dice { display:flex; gap:8px; margin-top:8px; }
+.dice select { width:100%; }
+.muted { color:var(--muted); font-size:.9rem; }
+table { width:100%; border-collapse:collapse; }
+th,td {
+  text-align:left;
+  padding:9px;
+  border-bottom:1px solid #28533b;
+}
+#message { min-height:1.4em; color:#ffe08a; }
+.scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>🎲 ゾロ目王</h1>
+  <p>シャー芯サイコロゲーム｜123（1→2→3）が最強！ 同じ役は同順位。</p>
+</header>
+
+<section>
+  <h2>対戦を入力</h2>
+  <div class="row">
+    <label for="playerCount">参加人数（2〜30人）</label>
+    <input id="playerCount" type="number" min="2" max="30" value="2">
+    <button id="makePlayers">人数を反映</button>
+  </div>
+  <div id="players" class="players"></div>
+  <div class="row" style="margin-top:14px">
+    <button id="judge">結果を判定・保存</button>
+    <button id="clearInputs" class="secondary">出目をリセット</button>
+  </div>
+  <p id="message" role="status"></p>
+</section>
+
+<section>
+  <h2>今回の結果</h2>
+  <div id="results" class="scroll">まだ対戦結果はありません。</div>
+</section>
+
+<section>
+  <h2>戦績ランキング</h2>
+  <div id="ranking" class="scroll">対戦するとランキングが表示されます。</div>
+</section>
+
+<section>
+  <h2>対戦履歴</h2>
+  <div class="row">
+    <button id="export" class="secondary">データを書き出す</button>
+    <label class="secondary" style="padding:9px;border-radius:9px;cursor:pointer">
+      データを読み込む
+      <input id="importFile" type="file" accept="application/json" hidden>
+    </label>
+    <button id="clearHistory" class="danger">履歴を全削除</button>
+  </div>
+  <div id="history" class="scroll"></div>
+  <p class="muted">データはこのブラウザ内に保存されます。別の端末・ブラウザとは自動で共有されません。</p>
+</section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const STORAGE = 'zoromeou_records_v1';
+let records = load();
+
+function load() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE) || '[]');
+  } catch {
+    return [];
+  }
+}
+function save() {
+  localStorage.setItem(STORAGE, JSON.stringify(records));
+  renderHistory();
+  renderRanking();
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;',
+    '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+
+function makePlayers() {
+  let n = Math.max(2, Math.min(30, Number($('playerCount').value) || 2));
+  $('playerCount').value = n;
+  $('players').innerHTML = Array.from({length:n}, (_,i) =>
+    `<div class="player">
+      <label>プレイヤー ${i+1}<br>
+        <input class="name" value="プレイヤー${i+1}" maxlength="30"
+          style="width:100%;margin-top:6px">
+      </label>
+      <div class="dice">
+        ${[1,2,3].map((_,j) =>
+          `<select class="die" aria-label="${i+1}人目の${j+1}回目">
+            ${[1,2,3,4,5,6].map(v=>`<option>${v}</option>`).join('')}
+          </select>`
+        ).join('')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function evaluate(d) {
+  if (d[0]===1 && d[1]===2 && d[2]===3) {
+    return {key:[4,0,0,0], role:'123（最強役）'};
+  }
+
+  const counts = {};
+  d.forEach(x => counts[x] = (counts[x] || 0) + 1);
+
+  const triple = Object.keys(counts).find(x => counts[x]===3);
+  if (triple) {
+    return {
+      key:[3,+triple,0,0],
+      role:`ゾロ目 ${triple}・${triple}・${triple}`
+    };
+  }
+
+  const pair = Object.keys(counts).find(x => counts[x]===2);
+  if (pair) {
+    const kicker = +Object.keys(counts).find(x => counts[x]===1);
+    return {
+      key:[2,+pair,kicker,0],
+      role:`ペア ${pair}・${pair}（${kicker}）`
+    };
+  }
+
+  const sorted = [...d].sort((a,b)=>b-a);
+  return {key:[1,...sorted], role:`通常 ${sorted.join('・')}`};
+}
+
+function compare(a,b) {
+  for (let i=0; i<Math.max(a.length,b.length); i++) {
+    const diff = (a[i]||0) - (b[i]||0);
+    if (diff) return diff;
+  }
+  return 0;
+}
+
+function rankResults(players) {
+  const sorted = [...players].sort((a,b)=>compare(b.key,a.key));
+  let rank = 0;
+  sorted.forEach((p,i) => {
+    if (i===0 || compare(p.key,sorted[i-1].key)!==0) rank=i+1;
+    p.rank=rank;
+  });
+  return sorted;
+}
+
+function judge() {
+  const cards = [...document.querySelectorAll('.player')];
+  const players = cards.map((card,i) => {
+    const name = card.querySelector('.name').value.trim() || `プレイヤー${i+1}`;
+    const dice = [...card.querySelectorAll('.die')].map(x=>Number(x.value));
+    return {name,dice,...evaluate(dice)};
+  });
+
+  const results = rankResults(players);
+  const winners = results.filter(p=>p.rank===1).map(p=>p.name);
+
+  $('results').innerHTML = `<table>
+    <thead><tr><th>順位</th><th>名前</th><th>出目</th><th>役</th></tr></thead>
+    <tbody>${results.map(p=>`<tr>
+      <td>${p.rank}位</td>
+      <td>${esc(p.name)}</td>
+      <td>${p.dice.join('・')}</td>
+      <td>${esc(p.role)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+
+  records.unshift({
+    id: Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),
+    date: new Date().toLocaleString('ja-JP'),
+    players: results.map(({name,dice,role,key,rank})=>({name,dice,role,key,rank})),
+    winners
+  });
+
+  save();
+  $('message').textContent = `${winners.join('・')} が${winners.length>1?'同率':' '}1位！`;
+}
+
+function renderRanking() {
+  const stats = {};
+  records.forEach(r=>r.players.forEach(p=>{
+    if (!stats[p.name]) stats[p.name]={name:p.name,plays:0,wins:0};
+    stats[p.name].plays++;
+    if (p.rank===1) stats[p.name].wins++;
+  }));
+
+  const arr = Object.values(stats).sort((a,b)=>
+    b.wins-a.wins || b.plays-a.plays || a.name.localeCompare(b.name,'ja')
+  );
+
+  $('ranking').innerHTML = arr.length ? `<table>
+    <thead><tr><th>順位</th><th>名前</th><th>優勝回数</th><th>参加回数</th></tr></thead>
+    <tbody>${arr.map((p,i)=>`<tr>
+      <td>${i+1}</td><td>${esc(p.name)}</td>
+      <td>${p.wins}</td><td>${p.plays}</td>
+    </tr>`).join('')}</tbody>
+  </table>` : 'まだ対戦結果はありません。';
+}
+
+function renderHistory() {
+  $('history').innerHTML = records.length ? records.map(r=>`
+    <div class="player" style="margin-top:10px">
+      <div class="row">
+        <strong>${esc(r.date)}</strong>
+        <span class="muted">${r.players.length}人対戦</span>
+        <button class="danger" data-delete="${esc(r.id)}">この履歴を削除</button>
+      </div>
+      <p>1位：${r.winners.map(esc).join('・')}</p>
+      <div class="muted">${r.players.map(p=>
+        `${esc(p.name)}［${p.dice.join('・')}／${esc(p.role)}／${p.rank}位］`
+      ).join('　')}</div>
+    </div>
+  `).join('') : '履歴はありません。';
+}
+
+$('makePlayers').addEventListener('click', makePlayers);
+$('judge').addEventListener('click', judge);
+
+$('clearInputs').addEventListener('click',()=>{
+  document.querySelectorAll('.die').forEach(x=>x.value='1');
+  $('message').textContent='出目をリセットしました。';
+});
+
+$('clearHistory').addEventListener('click',()=>{
+  if (confirm('対戦履歴とランキングをすべて削除しますか？')) {
+    records=[];
+    save();
+    $('results').textContent='まだ対戦結果はありません。';
+    $('message').textContent='履歴を削除しました。';
+  }
+});
+
+$('history').addEventListener('click',e=>{
+  const b=e.target.closest('[data-delete]');
+  if (b) {
+    records=records.filter(r=>r.id!==b.dataset.delete);
+    save();
+  }
+});
+
+$('export').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(records,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='zoromeou-data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+$('importFile').addEventListener('change',async e=>{
+  const f=e.target.files[0];
+  if (!f) return;
+  try {
+    const data=JSON.parse(await f.text());
+    if (!Array.isArray(data) || !data.every(r=>r&&Array.isArray(r.players))) throw Error();
+    records=data.concat(records);
+    save();
+    $('message').textContent='データを読み込みました。';
+  } catch {
+    $('message').textContent='読み込み失敗：正しいゾロ目王JSONファイルを選んでね。';
+  }
+  e.target.value='';
+});
+
+makePlayers();
+renderHistory();
+renderRanking();
+</script>
+</body>
+</html>
